@@ -355,11 +355,15 @@ for (const change of ["a new app", "the control destroyed"]) {
                 componentCreated: () => state.created++,
               });
               // the moment the component is asked for - Component.create
-              // has not resolved yet; whoever creates it goes through here
+              // has not resolved yet; whoever creates it goes through here.
+              // The frontend is z2ui5, or the second name a newer bundle
+              // gives it (componentName of z2ui5/embed) - the control's
+              // release after 0.1.1 creates it under that one
+              const names = ["z2ui5", "z2ui5.embed.frontend"];
               const create = Component.create;
               Component.create = function (options) {
                 const creating = create.apply(this, arguments);
-                if (options.name !== "z2ui5") return creating;
+                if (!names.includes(options.name)) return creating;
                 Component.create = create;
                 queueMicrotask(() => {
                   const acted = state.created === 0;
