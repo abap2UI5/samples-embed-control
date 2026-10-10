@@ -180,7 +180,7 @@ nothing else is needed: the proxy is for `ui5 serve` only.
 ## Coming from abap2UI5-addons/fiori-elements-integration
 
 This example is the successor of
-[abap2UI5-addons/fiori-elements-integration](https://github.com/abap2UI5-addons/fiori-elements-integration):
+`abap2UI5-addons/fiori-elements-integration` (no longer published):
 the same list report and object page on a RAP service of `T005T`, the same
 section after the facet, the fields of the object as startup parameters.
 What the control takes over:
