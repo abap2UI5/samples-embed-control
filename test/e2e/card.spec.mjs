@@ -173,6 +173,17 @@ test("a destination on another origin loads nothing", async ({ page }) => {
   expect(foreign).toEqual([]);
 });
 
+// A host that resolves the destination to no URL at all: the card says so
+// instead of staying empty.
+test("a destination that is no URL is named", async ({ page }) => {
+  await placeCard(page, "broken", "http://[{name}", {});
+
+  await expect(
+    card(page, "broken").getByText(/resolves to no URL/),
+  ).toBeVisible();
+  await expect(postButtons(page)).toHaveCount(2);
+});
+
 test("without a class the card starts nothing", async ({ page }) => {
   await placeCard(page, "empty", "{origin}", { app: { value: "" } });
 

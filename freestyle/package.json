@@ -11,10 +11,10 @@
     "build": "ui5 build --clean-dest"
   },
   "dependencies": {
-    "@abap2ui5/embed-control": "^0.1.0"
+    "@abap2ui5/embed-control": "^0.1.1"
   },
   "devDependencies": {
-    "@ui5/cli": "^4.0.70",
+    "@ui5/cli": "^4.0.71",
     "ui5-middleware-simpleproxy": "^3.9.0"
   }
 }

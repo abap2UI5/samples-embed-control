@@ -188,7 +188,7 @@ definition, the OData V2 binding and the abap2UI5 app
 again from the view. The dev server answers the service from a mock under
 the binding's own paths; the branch `rap` has it all for a system -
 [below](#install-the-branch-rap). It is the successor of
-[abap2UI5-addons/fiori-elements-integration](https://github.com/abap2UI5-addons/fiori-elements-integration),
+`abap2UI5-addons/fiori-elements-integration` (no longer published),
 without its controller extension and its launchpad target mapping -
 [`fiori-elements-v2/README.md`](https://github.com/abap2UI5/samples-embed-control/blob/standard/fiori-elements-v2/README.md)
 compares the two.

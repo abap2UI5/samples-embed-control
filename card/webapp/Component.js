@@ -80,7 +80,15 @@ sap.ui.define(
       _start(values, url) {
         // the card may be gone by the time its host has answered
         if (this.isDestroyed()) return;
-        const destination = new URL(url, window.location.href);
+        // a destination the host resolves to no URL at all would throw
+        // here, inside the promise, and leave the card empty without a word
+        let destination;
+        try {
+          destination = new URL(url, window.location.href);
+        } catch (e) {
+          this._fail(`The destination resolves to no URL: '${url}'.`);
+          return;
+        }
         if (destination.origin !== window.location.origin) {
           this._fail(
             `The destination resolves to ${destination.origin}, not to this ` +
