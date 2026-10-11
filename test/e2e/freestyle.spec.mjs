@@ -267,7 +267,8 @@ test("a logon page instead of the bundle ends in componentFailed", async ({
       }),
   );
   await page.goto(`/index.html${testInfo.project.metadata.query ?? ""}`);
-  await expect(page.getByText(/abap2UI5 could not start/)).toBeVisible({
+  // all three controls fail, each says so
+  await expect(page.getByText(/abap2UI5 could not start/).first()).toBeVisible({
     timeout: 45_000,
   });
   await expect(postButtons(page)).toHaveCount(0);

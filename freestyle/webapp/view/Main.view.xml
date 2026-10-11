@@ -36,8 +36,18 @@
                     class="sapUiTinyMarginBottom"
                     text="Each control runs its own abap2UI5 session - type a name on one side and post it, the other side keeps its own state."/>
                 <l:Grid defaultSpan="XL6 L6 M12 S12" hSpacing="1" vSpacing="0">
-                    <z2ui5:Container id="left" app="Z2UI5_CL_UI5_APP_HI_WORLD" height="360px" class="demoHostFrame"/>
-                    <z2ui5:Container id="right" app="Z2UI5_CL_UI5_APP_HI_WORLD" height="360px" class="demoHostFrame"/>
+                    <z2ui5:Container
+                        id="left"
+                        app="Z2UI5_CL_UI5_APP_HI_WORLD"
+                        height="360px"
+                        class="demoHostFrame"
+                        componentFailed=".onComponentFailed"/>
+                    <z2ui5:Container
+                        id="right"
+                        app="Z2UI5_CL_UI5_APP_HI_WORLD"
+                        height="360px"
+                        class="demoHostFrame"
+                        componentFailed=".onComponentFailed"/>
                 </l:Grid>
             </VBox>
         </Page>
