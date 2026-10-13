@@ -113,9 +113,9 @@ test(
   },
 );
 
-// The app takes the room the card gives it and no more: sap.m.App and
-// sap.m.Shell set height:100% on every ancestor up to <html>, unless the
-// control marks its area as their root.
+// The app takes the room the card gives it and no more: sap.m.App (the
+// root up to abap2UI5 1.147.0) and sap.m.Shell set height:100% on every
+// ancestor up to <html>, unless the control marks its area as their root.
 test("the card keeps the height of its content", async ({ page }) => {
   const box = await card(page, "hello").boundingBox();
   const app = await card(page, "hello")
