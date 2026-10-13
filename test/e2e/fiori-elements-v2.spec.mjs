@@ -2,15 +2,17 @@ import { test, expect } from "@playwright/test";
 
 // The Fiori elements example for OData V2 (examples/fiori-elements-v2): a
 // list report and an object page of countries, from a mock of the RAP
-// service in its abap/, and in the object page an extension after the facet
-// "General" with a z2ui5.embed.Container that runs Z2UI5_CL_UI5_APP_HI_WORLD
-// for the country on the page - three of its fields go in as the startup
-// parameters "country", "language" and "nationality".
+// service in its abap/, and in the object page two extensions with a
+// z2ui5.embed.Container each, both running Z2UI5_CL_UI5_APP_HI_WORLD for the
+// country on the page: after the facet "General" with three of its fields as
+// the startup parameters "country", "language" and "nationality", after the
+// facet "Language" with "country" alone.
 
 // SAPUI5 with the V2 templates boots slower than the freestyle app
 test.describe.configure({ timeout: 120_000 });
 
-const section = (page) => page.locator(".z2ui5EmbedContainer");
+const section = (page) => page.locator(".z2ui5EmbedContainer").first();
+const languages = (page) => page.locator(".z2ui5EmbedContainer").nth(1);
 const post = (page) => section(page).getByRole("button", { name: "Post" });
 
 // the component data of every app START (an event roundtrip carries none)
@@ -46,21 +48,50 @@ test("the extension runs the app with the fields of the country on the page", as
   const starts = appStarts(page);
   await openCountry(page, "Austria");
 
-  await expect(page.getByText("abap2UI5 - Hello World")).toBeVisible();
-  expect(starts).toEqual([
-    {
-      country: ["AT"],
-      language: ["EN"],
-      nationality: ["Austrian"],
-      app_start: ["Z2UI5_CL_UI5_APP_HI_WORLD"],
-    },
-  ]);
-  // a section of its own after the facet the annotations make, as
-  // manifest.json places it
+  await expect(page.getByText("abap2UI5 - Hello World").first()).toBeVisible();
+  await expect(
+    languages(page).getByRole("button", { name: "Post" }),
+  ).toBeVisible();
+  // one start per extension - the second one gets the country alone
+  await expect.poll(() => starts.length).toBe(2);
+  expect(starts).toContainEqual({
+    country: ["AT"],
+    language: ["EN"],
+    nationality: ["Austrian"],
+    app_start: ["Z2UI5_CL_UI5_APP_HI_WORLD"],
+  });
+  expect(starts).toContainEqual({
+    country: ["AT"],
+    app_start: ["Z2UI5_CL_UI5_APP_HI_WORLD"],
+  });
+  // each a section of its own after the facet the annotations make, as
+  // manifest.json places them
   await expect(page.getByRole("tab")).toHaveText([
     "General Information",
     "abap2UI5",
+    "Language",
+    "abap2UI5 - every language",
   ]);
+});
+
+// Two extensions, two controls, two abap2UI5 sessions: what one app holds,
+// the other does not see
+test("the two extensions run two apps, each in its own session", async ({
+  page,
+}) => {
+  await openCountry(page, "Austria");
+  await section(page).getByRole("textbox").fill("Alice");
+  await post(page).click();
+  await expect(page.getByText("Your name is Alice")).toBeVisible();
+  await page.getByRole("button", { name: "OK" }).click();
+
+  await expect(languages(page).getByRole("textbox")).toHaveValue("");
+  await languages(page).getByRole("textbox").fill("Bob");
+  await languages(page).getByRole("button", { name: "Post" }).click();
+  await expect(page.getByText("Your name is Bob")).toBeVisible();
+  await page.getByRole("button", { name: "OK" }).click();
+
+  await expect(section(page).getByRole("textbox")).toHaveValue("Alice");
 });
 
 // abap2UI5 leaves the URL to the page it is embedded in: an abap2UI5 without
@@ -93,12 +124,20 @@ test("another country ends the session and starts the app with its fields", asyn
 
   // The V2 templates keep the object page and rebind it to the next country,
   // so the section stays on the page and its control starts anew in place
+  // the first extension's starts - the second one's carry no nationality
   await expect
-    .poll(() => starts.map((s) => [s.country, s.nationality]))
+    .poll(() =>
+      starts
+        .filter((s) => s.nationality)
+        .map((s) => [s.country, s.nationality]),
+    )
     .toEqual([
       [["AT"], ["Austrian"]],
       [["CH"], ["Swiss"]],
     ]);
+  await expect
+    .poll(() => starts.filter((s) => !s.nationality).map((s) => s.country))
+    .toEqual([["AT"], ["CH"]]);
   await expect(post(page)).toBeVisible();
   // a new session: nothing of the first country's app is left
   await expect(section(page).getByRole("textbox")).toHaveValue("");

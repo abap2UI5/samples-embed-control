@@ -2,9 +2,9 @@
 <!-- The annotations of the OData V2 service, as a RAP service serves them
      apart from its metadata: the document the catalog service answers for
      Z2UI5_UI_EMBED_COUNTRY_O2_VAN, made from the metadata extension
-     Z2UI5_C_EMBED_COUNTRY of abap/. The facet "General" is the one the
-     abap2UI5 section is placed after (manifest.json:
-     "AfterFacet|Countries|General"). -->
+     Z2UI5_C_EMBED_COUNTRY of abap/. The facets "General" and "Language"
+     are the ones the two abap2UI5 sections are placed after (manifest.json:
+     "AfterFacet|Countries|General", "AfterFacet|Countries|Language"). -->
 <edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
     <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
         <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
@@ -21,6 +21,11 @@
                             <PropertyValue Property="Label" String="General Information"/>
                             <PropertyValue Property="ID" String="General"/>
                             <PropertyValue Property="Target" AnnotationPath="@UI.Identification"/>
+                        </Record>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Language"/>
+                            <PropertyValue Property="ID" String="Language"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Language"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -51,10 +56,18 @@
                         <Record Type="UI.DataField">
                             <PropertyValue Property="Value" Path="Nationality"/>
                         </Record>
-                        <Record Type="UI.DataField">
-                            <PropertyValue Property="Value" Path="Language"/>
-                        </Record>
                     </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="Language">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Value" Path="Language"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
                 </Annotation>
                 <Annotation Term="UI.LineItem">
                     <Collection>

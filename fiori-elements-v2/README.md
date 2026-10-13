@@ -1,12 +1,13 @@
 # Example: abap2UI5 inside a Fiori elements app for OData V2, on a RAP service
 
 A Fiori elements app for OData V2 - list report and object page of
-countries - with an abap2UI5 app in an **extension of its object page**,
-placed by the control from npm:
+countries - with an abap2UI5 app in each of **two extensions of its object
+page**, placed by the control from npm:
 [`@abap2ui5/embed-control`](https://www.npmjs.com/package/@abap2ui5/embed-control).
-The extension runs the ABAP class for the country on the page: three of its
-fields go in as startup parameters. Next to the app, `abap/` has the RAP
-service it reads and the abap2UI5 app it starts on a system.
+Each extension runs an ABAP class for the country on the page, in a session
+of its own: the first gets three of its fields as startup parameters, the
+second the country alone. Next to the app, `abap/` has the RAP service it
+reads and the two abap2UI5 apps it starts on a system.
 
 ## How the package is included
 
@@ -19,16 +20,18 @@ The same three places as in any UI5 app:
 | `ui5-local.yaml` | the same, with the proxy to abap2UI5 running locally in Node |
 | `webapp/manifest.json` | the `z2ui5.embed` resourceRoot: `./thirdparty/z2ui5/embed/` |
 
-## The object page extension
+## The object page extensions
 
-Two files and one entry - the view extension the Fiori elements templates
-for OData V2 have for content of their own:
+A fragment and an entry per extension, and one module for both - the view
+extension the Fiori elements templates for OData V2 have for content of
+their own:
 
 | File | |
 |---|---|
-| `webapp/manifest.json` | the extension, in `sap.ui5/extends/extensions/sap.ui.viewExtensions`: a section of its own after the facet `General` of the entity set `Countries`, and its title |
-| `webapp/ext/Abap2UI5Section.fragment.xml` | the `z2ui5:Container`, bound to the country on the page |
-| `webapp/ext/Abap2UI5Section.js` | which ABAP class runs, and with which parameters |
+| `webapp/manifest.json` | the extensions, in `sap.ui5/extends/extensions/sap.ui.viewExtensions`: a section of its own after the facet `General` of the entity set `Countries`, one after the facet `Language`, and their titles |
+| `webapp/ext/Abap2UI5Section.fragment.xml` | the first `z2ui5:Container`, bound to the country on the page |
+| `webapp/ext/Abap2UI5Languages.fragment.xml` | the second one, bound to the same country |
+| `webapp/ext/Abap2UI5Section.js` | which ABAP class each runs, and with which parameters |
 
 ```json
 "extends": {
@@ -40,6 +43,12 @@ for OData V2 have for content of their own:
           "className": "sap.ui.core.Fragment",
           "fragmentName": "demo.fev2.ext.Abap2UI5Section",
           "sap.ui.generic.app": { "title": "abap2UI5" }
+        },
+        "AfterFacet|Countries|Language": {
+          "type": "XML",
+          "className": "sap.ui.core.Fragment",
+          "fragmentName": "demo.fev2.ext.Abap2UI5Languages",
+          "sap.ui.generic.app": { "title": "abap2UI5 - every language" }
         }
       }
     }
@@ -55,6 +64,14 @@ for OData V2 have for content of their own:
     height="420px"/>
 ```
 
+```xml
+<z2ui5:Container
+    core:require="{ Section: 'demo/fev2/ext/Abap2UI5Section' }"
+    app="{ path: 'Country', formatter: 'Section.languagesApp' }"
+    params="{ path: 'Country', formatter: 'Section.languagesParams' }"
+    height="420px"/>
+```
+
 - The extension is bound to the object, so `Country`, `Language` and
   `Nationality` are the fields of the country on the page. Nothing starts
   before the page has one with all three fields: `app` waits for the same
@@ -63,8 +80,12 @@ for OData V2 have for content of their own:
 - The templates keep the object page and bind it to the next object, so the
   control stays on the page: another country ends the running abap2UI5
   session, and the control starts a new one in place with the new fields.
-- `General` is the `id` of the facet in the metadata extension (`abap/`) -
-  `AfterFacet|<entity set>|<facet id>` places the section after it.
+- Every control is an abap2UI5 session of its own: the two extensions are
+  two apps that know nothing of each other.
+- `General` and `Language` are the `id`s of the facets in the metadata
+  extension (`abap/`) - `AfterFacet|<entity set>|<facet id>` places a
+  section after one. A facet takes one extension after it, so the second
+  section has a facet of its own to follow.
 - An OData V2 binding hands over the values as they are, so a composite
   binding with a formatter is all `params` needs - no `targetType`, which an
   OData V4 binding needs to hand over a key unconverted.
@@ -95,10 +116,11 @@ abapGit's file format:
 | Object | |
 |---|---|
 | `Z2UI5_C_EMBED_COUNTRY` (DDLS) | the CDS view entity: the countries of `T005T` in the logon language - `Country`, `CountryName`, `Nationality`, `Language` |
-| `Z2UI5_C_EMBED_COUNTRY` (DDLX) | its metadata extension - list report columns, header, and the facet `General` the section is placed after |
+| `Z2UI5_C_EMBED_COUNTRY` (DDLX) | its metadata extension - list report columns, header, and the facets `General` and `Language` the two sections are placed after |
 | `Z2UI5_UI_EMBED_COUNTRY` (SRVD) | the service definition, exposing the view as `Countries` |
 | `Z2UI5_UI_EMBED_COUNTRY_O2` (SRVB) | the OData V2 UI binding: `/sap/opu/odata/sap/Z2UI5_UI_EMBED_COUNTRY_O2/`, its annotations as `Z2UI5_UI_EMBED_COUNTRY_O2_VAN` |
-| `Z2UI5_CL_EMBED_COUNTRY` (CLAS) | the abap2UI5 app: shows the startup parameters as they came, and reads the country again from the view |
+| `Z2UI5_CL_EMBED_COUNTRY` (CLAS) | the abap2UI5 app of the first section: shows the startup parameters as they came, and reads the country again from the view |
+| `Z2UI5_CL_EMBED_LANGUAGES` (CLAS) | the abap2UI5 app of the second section: the country's name in every language of the system, from `T005T` |
 
 It needs a system with RAP view entities and OData V2 bindings - SAP
 S/4HANA 2020 (ABAP 7.55) or later - and abap2UI5 1.146.0 or later. `T005T`
@@ -141,10 +163,10 @@ The section runs on the system, the list and the object page still come
 from the mock service. With the RAP service of `abap/` in the system,
 delete the `sap-fe-mockserver` entry of `ui5.yaml` - the app reads the real
 service under the same paths - and set `APP` in `ext/Abap2UI5Section.js` to
-`Z2UI5_CL_EMBED_COUNTRY`.
+`Z2UI5_CL_EMBED_COUNTRY`, `LANGUAGES_APP` to `Z2UI5_CL_EMBED_LANGUAGES`.
 
-The extension starts `Z2UI5_CL_UI5_APP_HI_WORLD`, which every abap2UI5
-installation has, the local one included - put your class into
+Both extensions start `Z2UI5_CL_UI5_APP_HI_WORLD`, which every abap2UI5
+installation has, the local one included - put your classes into
 `ext/Abap2UI5Section.js`.
 
 The proxy tells the backend the dev server's host in `X-Forwarded-Host`, and
@@ -158,7 +180,8 @@ is needed. Fiori elements for OData V2 is part of SAPUI5, not of OpenUI5:
 delivers all of it, ready for one abapGit pull, on its branch `rap`: the
 objects of `abap/` in `src/01`, and this app as the BSP `Z2UI5_HOST_FE` in
 `src/02` - the control from npm in `thirdparty/z2ui5/embed/`, the mock
-service left out, and `Z2UI5_CL_EMBED_COUNTRY` as the class it starts.
+service left out, and `Z2UI5_CL_EMBED_COUNTRY` and
+`Z2UI5_CL_EMBED_LANGUAGES` as the classes it starts.
 
 1. abap2UI5 1.146.0 or later in the system, its HTTP service
    `/sap/bc/z2ui5` active.

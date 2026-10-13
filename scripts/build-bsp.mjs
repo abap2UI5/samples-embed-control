@@ -36,10 +36,10 @@
 //                    starts, as git has them
 //   src/02/          the BSP Z2UI5_HOST_FE: fiori-elements-v2/webapp without
 //                    its mock service, the control in thirdparty/z2ui5/embed/
-//                    as above - and starting Z2UI5_CL_EMBED_COUNTRY of src/01
-//                    instead of the hello world app, the one patch of an
-//                    example (the UI5 project runs locally too, where only
-//                    abap2UI5's own apps exist)
+//                    as above - and starting Z2UI5_CL_EMBED_COUNTRY and
+//                    Z2UI5_CL_EMBED_LANGUAGES of src/01 instead of the hello
+//                    world app, the one patch of an example (the UI5 project
+//                    runs locally too, where only abap2UI5's own apps exist)
 //   .abapgit.xml, README.md, LICENSE, VERSION
 // The deliver workflow runs this on every push to main and writes each tree
 // as one commit on top of main to its branch.
@@ -98,6 +98,7 @@ const SHOWN = {
   ],
   "fiori-elements-v2": [
     ["webapp/manifest.json", '"AfterFacet|Countries|General"'],
+    ["webapp/manifest.json", '"AfterFacet|Countries|Language"'],
     ["webapp/manifest.json", '"/sap/opu/odata/sap/Z2UI5_UI_EMBED_COUNTRY_O2/"'],
     ["webapp/ext/Abap2UI5Section.fragment.xml", 'xmlns:z2ui5="z2ui5.embed"'],
     ["abap/z2ui5_ui_embed_country.srvd.srvdsrv", "as Countries"],
@@ -144,11 +145,18 @@ const BRANCHES = {
       icf: "abap2UI5 - embed control, Fiori elements V2",
       // the mock of the RAP service: the system has the real one
       leaveOut: ["localService"],
-      // the app the BSP runs is the one src/01 brings
+      // the apps the BSP runs are the ones src/01 brings
       patch: [
-        "ext/Abap2UI5Section.js",
-        'const APP = "Z2UI5_CL_UI5_APP_HI_WORLD";',
-        'const APP = "Z2UI5_CL_EMBED_COUNTRY";',
+        [
+          "ext/Abap2UI5Section.js",
+          'const APP = "Z2UI5_CL_UI5_APP_HI_WORLD";',
+          'const APP = "Z2UI5_CL_EMBED_COUNTRY";',
+        ],
+        [
+          "ext/Abap2UI5Section.js",
+          'const LANGUAGES_APP = "Z2UI5_CL_UI5_APP_HI_WORLD";',
+          'const LANGUAGES_APP = "Z2UI5_CL_EMBED_LANGUAGES";',
+        ],
       ],
     },
   },
@@ -320,8 +328,7 @@ function buildBsp(tree, work, control, bsp) {
     recursive: true,
     filter: (path) => !left.some((l) => path === l || path.startsWith(l + "/")),
   });
-  if (bsp.patch) {
-    const [file, from, to] = bsp.patch;
+  for (const [file, from, to] of bsp.patch ?? []) {
     mustReplace(join(webapp, file), from, to);
   }
   cpSync(join(control, "src"), join(webapp, THIRDPARTY), { recursive: true });

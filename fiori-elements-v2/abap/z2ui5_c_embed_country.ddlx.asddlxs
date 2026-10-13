@@ -10,8 +10,9 @@
 annotate view Z2UI5_C_EMBED_COUNTRY with
 {
 
-  // "General" - the facet the Fiori elements app places its abap2UI5
-  // section after (manifest.json: "AfterFacet|Countries|General")
+  // "General" and "Language" - the facets the Fiori elements app places
+  // its two abap2UI5 sections after (manifest.json:
+  // "AfterFacet|Countries|General", "AfterFacet|Countries|Language")
   @UI.facet: [
       {
         id: 'General',
@@ -19,6 +20,14 @@ annotate view Z2UI5_C_EMBED_COUNTRY with
         type: #IDENTIFICATION_REFERENCE,
         label: 'General Information',
         position: 10
+      },
+      {
+        id: 'Language',
+        purpose: #STANDARD,
+        type: #FIELDGROUP_REFERENCE,
+        targetQualifier: 'Language',
+        label: 'Language',
+        position: 20
       }
     ]
 
@@ -34,7 +43,7 @@ annotate view Z2UI5_C_EMBED_COUNTRY with
          identification: [ { position: 30 } ] }
   Nationality;
 
-  @UI: { identification: [ { position: 40 } ] }
+  @UI: { fieldGroup: [ { qualifier: 'Language', position: 10 } ] }
   Language;
 
 }
