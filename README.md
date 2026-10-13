@@ -350,8 +350,9 @@ BSP Z2UI5_HOST_FE                                  the Fiori elements app
 
 - One frontend per page: the first control that starts decides where it
   comes from; every control still sends its roundtrips to its own endpoint.
-- Embedding is still page-wide in places - busy indicator, title, the
-  `sap.m.App` root - until abap2UI5's embedded mode covers them
+- Embedding is still page-wide in places up to abap2UI5 1.147.0 - busy
+  indicator, title, the full-screen `sap.m.App` root; the release after
+  1.147.0 leaves them to the host, with a `sap.m.NavContainer` as the root
   ([backlog item](https://github.com/abap2UI5/abap2UI5/blob/main/backlog/items/embed-as-reuse-component.md));
   the URL hash is the host's from abap2UI5 1.146.0 on.
 - Custom controls from `Z2UI5_CCI`/`Z2UI5_CCC`: the bundle hands over their
