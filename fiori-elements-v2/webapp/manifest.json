@@ -78,6 +78,14 @@
               "sap.ui.generic.app": {
                 "title": "abap2UI5"
               }
+            },
+            "AfterFacet|Countries|Language": {
+              "type": "XML",
+              "className": "sap.ui.core.Fragment",
+              "fragmentName": "demo.fev2.ext.Abap2UI5Languages",
+              "sap.ui.generic.app": {
+                "title": "abap2UI5 - every language"
+              }
             }
           }
         }

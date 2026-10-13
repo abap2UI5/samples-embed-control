@@ -1,11 +1,11 @@
 # Example: abap2UI5 inside a Fiori elements app
 
 A Fiori elements app - list report and object page of customers - with an
-abap2UI5 app in a **custom section of its object page**, placed by the
-control from npm:
+abap2UI5 app in each of **two custom sections of its object page**, placed
+by the control from npm:
 [`@abap2ui5/embed-control`](https://www.npmjs.com/package/@abap2ui5/embed-control).
-The section runs the ABAP class for the customer on the page: the
-customer's key goes in as a startup parameter.
+Each section runs an ABAP class for the customer on the page, in a session
+of its own: the customer's key goes in as a startup parameter.
 
 ## How the package is included
 
@@ -18,16 +18,17 @@ The same three places as in any UI5 app:
 | `ui5-local.yaml` | the same, with the proxy to abap2UI5 running locally in Node |
 | `webapp/manifest.json` | the `z2ui5.embed` resourceRoot: `./thirdparty/z2ui5/embed/` |
 
-## The custom section
+## The custom sections
 
-Two files and one entry - the custom extension a Fiori elements app has for
-content of its own:
+A fragment and an entry per section, and one module for both - the custom
+extension a Fiori elements app has for content of its own:
 
 | File | |
 |---|---|
-| `webapp/manifest.json` | the section, in the object page's `content.body.sections`: its fragment, its title, and where it goes (after the `General` facet) |
-| `webapp/ext/Abap2UI5Section.fragment.xml` | the `z2ui5:Container`, bound to the customer on the page |
-| `webapp/ext/Abap2UI5Section.js` | which ABAP class runs, and with which parameters |
+| `webapp/manifest.json` | the sections, in the object page's `content.body.sections`: their fragments, their titles, and where they go (after the `General` facet, the second after the first) |
+| `webapp/ext/Abap2UI5Section.fragment.xml` | the `z2ui5:Container` of the first section, bound to the customer on the page |
+| `webapp/ext/Abap2UI5SecondSection.fragment.xml` | the one of the second section - the same, with `Section.secondApp` for `app` |
+| `webapp/ext/Abap2UI5Section.js` | which ABAP class each section runs, and with which parameters |
 
 ```json
 "content": {
@@ -37,6 +38,11 @@ content of its own:
         "template": "demo.fe.ext.Abap2UI5Section",
         "title": "abap2UI5",
         "position": { "placement": "After", "anchor": "General" }
+      },
+      "abap2UI5Second": {
+        "template": "demo.fe.ext.Abap2UI5SecondSection",
+        "title": "abap2UI5 - a second app",
+        "position": { "placement": "After", "anchor": "abap2UI5" }
       }
     }
   }
@@ -59,6 +65,11 @@ content of its own:
   and an `Edm.String` does not convert into the object `params` is ("Don't
   know how to format String to object"). With it, the formatter gets the
   key as it is.
+- Every control is an abap2UI5 session of its own: the two sections are two
+  apps that know nothing of each other, started with the same key. Here
+  both run `Z2UI5_CL_UI5_APP_HI_WORLD`, which every abap2UI5 installation
+  has, the local one included - an app of your own names two classes of its
+  own in `ext/Abap2UI5Section.js`.
 - The control needs a height - a section gives it none of its own.
 
 The ABAP class reads the key as a startup parameter:

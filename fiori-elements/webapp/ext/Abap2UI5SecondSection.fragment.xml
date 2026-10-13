@@ -1,0 +1,13 @@
+<!-- The second custom section of the object page (manifest.json, "sections",
+     placed after the first one): another abap2UI5 app for the same customer.
+     Every control is a session of its own - this app runs next to the one of
+     Abap2UI5Section.fragment.xml and knows nothing of it. -->
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:z2ui5="z2ui5.embed">
+    <z2ui5:Container
+        core:require="{ Section: 'demo/fe/ext/Abap2UI5Section' }"
+        app="{ path: 'ID', formatter: 'Section.secondApp' }"
+        params="{ path: 'ID', targetType: 'any', formatter: 'Section.params' }"
+        height="420px"/>
+</core:FragmentDefinition>

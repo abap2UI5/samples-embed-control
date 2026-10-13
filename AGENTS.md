@@ -15,9 +15,9 @@ is developed in
 is an npm dependency like in any app.
 
 `main` is the source: a UI5 freestyle app (`freestyle/`), a Fiori elements
-app with the control in a custom section of its object page
+app with the control in two custom sections of its object page
 (`fiori-elements/`), a Fiori elements app for OData V2 with the control in
-an object page extension and the RAP service it reads
+two object page extensions and the RAP service it reads
 (`fiori-elements-v2/`), a generic UI Integration Card for SAP Build Work
 Zone (`card/`), Playwright tests that drive them against a live abap2UI5
 backend (`test/e2e/`), and the build of the branches `standard` and `rap`
@@ -30,9 +30,9 @@ backend (`test/e2e/`), and the build of the branches `standard` and `rap`
 | Path | |
 |---|---|
 | `freestyle/` | The freestyle example: a plain UI5 app, `includeDependency` and the `z2ui5.embed` resourceRoot, `ui5-middleware-simpleproxy` to the backend - `ui5.yaml` to an SAP system (`npm start`), `ui5-local.yaml` to abap2UI5 in Node on `localhost:3000` (`npm run start-local`, what the e2e tests use), `ui5-1.71.yaml` for the tests only. Delivered as `freestyle/` and as the BSP - its README is written for both places |
-| `fiori-elements/` | The Fiori elements example: SAPUI5, list report and object page on a mock OData V4 service (`@sap-ux/ui5-middleware-fe-mockserver`, `webapp/localService/`), the control in the object page's custom section (`webapp/ext/`) |
-| `fiori-elements-v2/` | The Fiori elements example for OData V2: SAPUI5, list report and object page (`sap.suite.ui.generic.template`) on a mock of the RAP service in `abap/`, under the paths the binding has in a system (`webapp/localService/`), the control in a view extension after the facet `General` (`webapp/ext/`). Delivered on `standard`, and on `rap` as BSP with the service |
-| `fiori-elements-v2/abap/` | The RAP service of that example and the abap2UI5 app it starts on a system, in abapGit's format: CDS view entity on `T005T`, metadata extension, service definition, OData V2 binding, `Z2UI5_CL_EMBED_COUNTRY`. The successor of abap2UI5-addons/fiori-elements-integration. Delivered as `src/01` of `rap` |
+| `fiori-elements/` | The Fiori elements example: SAPUI5, list report and object page on a mock OData V4 service (`@sap-ux/ui5-middleware-fe-mockserver`, `webapp/localService/`), the control in two custom sections of the object page, each its own session (`webapp/ext/`) |
+| `fiori-elements-v2/` | The Fiori elements example for OData V2: SAPUI5, list report and object page (`sap.suite.ui.generic.template`) on a mock of the RAP service in `abap/`, under the paths the binding has in a system (`webapp/localService/`), the control in two view extensions, after the facets `General` and `Language` (`webapp/ext/`). Delivered on `standard`, and on `rap` as BSP with the service |
+| `fiori-elements-v2/abap/` | The RAP service of that example and the two abap2UI5 apps it starts on a system, in abapGit's format: CDS view entity on `T005T`, metadata extension, service definition, OData V2 binding, `Z2UI5_CL_EMBED_COUNTRY`, `Z2UI5_CL_EMBED_LANGUAGES`. The successor of abap2UI5-addons/fiori-elements-integration. Delivered as `src/01` of `rap` |
 | `card/` | The card example: a UI Integration Card of type `Component`, generic - the class it runs is a card parameter, the backend a card destination the host resolves (`webapp/Component.js`, `onCardReady`) - with `webapp/dt/Configuration.js` for the host's configuration editor and a preview page in `webapp/test/` that `ui5 build` leaves out |
 | `test/e2e/` | Playwright tests of the examples, one spec file each (`playwright.config.mjs`) |
 | `scripts/build-bsp.mjs` | The branches, built with abap2UI5's tools into `out/standard/` and `out/rap/` |
@@ -143,9 +143,10 @@ of `main`.
   `standard`, the Fiori elements app for OData V2 on `rap`, with its RAP
   service. The one for OData V4 mocks a service no system has, and a card is
   deployed to its host. The BSP of `rap` leaves the mock service out and
-  starts `Z2UI5_CL_EMBED_COUNTRY` instead of the hello world app - the one
-  patch of an example (`patch` in `BRANCHES`), because the UI5 project has
-  to run locally too, where only abap2UI5's own apps exist.
+  starts `Z2UI5_CL_EMBED_COUNTRY` and `Z2UI5_CL_EMBED_LANGUAGES` instead of
+  the hello world app - the one patch of an example (`patch` in `BRANCHES`,
+  a list of replacements), because the UI5 project has to run locally too,
+  where only abap2UI5's own apps exist.
 - **`README.md` shows the package's three places in `freestyle/` and where
   each example places the control**, linked on the branch; the build fails
   when one of them no longer has what the README shows (`SHOWN`).

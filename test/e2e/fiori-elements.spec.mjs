@@ -2,15 +2,19 @@ import { test, expect } from "@playwright/test";
 
 // The Fiori elements example (examples/fiori-elements): a list report and an
 // object page of customers, from a mock OData V4 service, and in the object
-// page a custom section with a z2ui5.embed.Container that runs
+// page two custom sections, each with a z2ui5.embed.Container that runs
 // Z2UI5_CL_UI5_APP_HI_WORLD for the customer on the page - its key goes in
-// as the startup parameter "customer".
+// as the startup parameter "customer", and each control is a session of its
+// own.
 
 // SAPUI5 with sap.fe boots slower than the freestyle app
 test.describe.configure({ timeout: 120_000 });
 
-const section = (page) => page.locator(".z2ui5EmbedContainer");
+const section = (page) => page.locator(".z2ui5EmbedContainer").first();
+const second = (page) => page.locator(".z2ui5EmbedContainer").nth(1);
 const post = (page) => section(page).getByRole("button", { name: "Post" });
+
+const HELLO = { app_start: ["Z2UI5_CL_UI5_APP_HI_WORLD"] };
 
 // the component data of every app START (an event roundtrip carries none)
 function appStarts(page) {
@@ -41,10 +45,39 @@ test("the custom section runs the app for the customer on the page", async ({
   const starts = appStarts(page);
   await openCustomer(page, "Alpine Tools");
 
-  await expect(page.getByText("abap2UI5 - Hello World")).toBeVisible();
-  expect(starts).toEqual([
-    { customer: ["1001"], app_start: ["Z2UI5_CL_UI5_APP_HI_WORLD"] },
-  ]);
+  await expect(page.getByText("abap2UI5 - Hello World").first()).toBeVisible();
+  // one start per section, both with the key of the customer on the page
+  await expect
+    .poll(() => starts)
+    .toEqual([
+      { customer: ["1001"], ...HELLO },
+      { customer: ["1001"], ...HELLO },
+    ]);
+});
+
+// Two custom sections, two controls, two abap2UI5 sessions: what one app
+// holds, the other does not see
+test("two sections run two apps side by side, each in its own session", async ({
+  page,
+}) => {
+  await openCustomer(page, "Alpine Tools");
+  await expect(page.locator(".z2ui5EmbedContainer")).toHaveCount(2);
+  await expect(
+    second(page).getByRole("button", { name: "Post" }),
+  ).toBeVisible();
+
+  await section(page).getByRole("textbox").fill("Alice");
+  await post(page).click();
+  await expect(page.getByText("Your name is Alice")).toBeVisible();
+  await page.getByRole("button", { name: "OK" }).click();
+
+  await expect(second(page).getByRole("textbox")).toHaveValue("");
+  await second(page).getByRole("textbox").fill("Bob");
+  await second(page).getByRole("button", { name: "Post" }).click();
+  await expect(page.getByText("Your name is Bob")).toBeVisible();
+  await page.getByRole("button", { name: "OK" }).click();
+
+  await expect(section(page).getByRole("textbox")).toHaveValue("Alice");
 });
 
 // abap2UI5 leaves the URL to the page it is embedded in: an abap2UI5 without
@@ -75,7 +108,9 @@ test("another customer ends the session and starts the app with its key", async 
   await page.goBack();
   await openCustomer(page, "Lakeside Foods");
 
-  expect(starts.map((s) => s.customer)).toEqual([["1001"], ["1002"]]);
+  await expect
+    .poll(() => starts.map((s) => s.customer))
+    .toEqual([["1001"], ["1001"], ["1002"], ["1002"]]);
   // a new session: nothing of the first customer's app is left
   await expect(section(page).getByRole("textbox")).toHaveValue("");
   expect(new URL(page.url()).hash).toBe("#/Customers('1002')");

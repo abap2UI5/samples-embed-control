@@ -1,0 +1,14 @@
+<!-- The second object page extension (manifest.json, "sap.ui.viewExtensions"):
+     another abap2UI5 app in a section of its own, after the facet "Language".
+     Every control is a session of its own - this app runs next to the one of
+     Abap2UI5Section.fragment.xml and knows nothing of it. It gets the country
+     on the page alone. -->
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:z2ui5="z2ui5.embed">
+    <z2ui5:Container
+        core:require="{ Section: 'demo/fev2/ext/Abap2UI5Section' }"
+        app="{ path: 'Country', formatter: 'Section.languagesApp' }"
+        params="{ path: 'Country', formatter: 'Section.languagesParams' }"
+        height="420px"/>
+</core:FragmentDefinition>

@@ -21,8 +21,8 @@ apps and a card:
 | Path | |
 |---|---|
 | [`freestyle/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/freestyle) | a UI5 freestyle app with three containers - the package is an npm dependency like any other |
-| [`fiori-elements/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/fiori-elements) | a Fiori elements app for OData V4, list report and object page, with the control in a **custom section** of the object page - the abap2UI5 app gets the key of the object on the page |
-| [`fiori-elements-v2/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/fiori-elements-v2) | a Fiori elements app for **OData V2** with the control in an **extension of its object page**, and in `abap/` the **RAP service** it reads and the abap2UI5 app it starts - the app gets fields of the object on the page |
+| [`fiori-elements/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/fiori-elements) | a Fiori elements app for OData V4, list report and object page, with the control in **two custom sections** of the object page - two abap2UI5 apps side by side, each in its own session, both getting the key of the object on the page |
+| [`fiori-elements-v2/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/fiori-elements-v2) | a Fiori elements app for **OData V2** with the control in **two extensions of its object page**, and in `abap/` the **RAP service** it reads and the two abap2UI5 apps it starts - the apps get fields of the object on the page |
 | [`card/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/card) | a **UI Integration Card** for SAP Build Work Zone that runs any abap2UI5 app - the class is a card parameter, the backend a card destination |
 | [`src/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/src) | the freestyle app as the BSP `Z2UI5_HOST`, with the control from npm where `ui5 build` puts it - to try it on a system with a plain abapGit pull |
 | `VERSION` | the commit of `main`, the version of `@abap2ui5/embed-control` and the abap2UI5 tools the branch is built from |
@@ -32,8 +32,8 @@ system with RAP:
 
 | Path | |
 |---|---|
-| [`src/01/`](https://github.com/abap2UI5/samples-embed-control/tree/rap/src/01) | the RAP service of `fiori-elements-v2/abap` - CDS view, metadata extension, service definition, OData V2 binding - and the abap2UI5 app `Z2UI5_CL_EMBED_COUNTRY` |
-| [`src/02/`](https://github.com/abap2UI5/samples-embed-control/tree/rap/src/02) | `fiori-elements-v2` as the BSP `Z2UI5_HOST_FE`, on that service and starting that app |
+| [`src/01/`](https://github.com/abap2UI5/samples-embed-control/tree/rap/src/01) | the RAP service of `fiori-elements-v2/abap` - CDS view, metadata extension, service definition, OData V2 binding - and the abap2UI5 apps `Z2UI5_CL_EMBED_COUNTRY` and `Z2UI5_CL_EMBED_LANGUAGES` |
+| [`src/02/`](https://github.com/abap2UI5/samples-embed-control/tree/rap/src/02) | `fiori-elements-v2` as the BSP `Z2UI5_HOST_FE`, on that service and starting those apps |
 | `VERSION` | as on `standard` |
 
 None of them carries a copy of the abap2UI5 frontend: the control loads it
@@ -106,7 +106,8 @@ supports are in the
 
 The object page of a Fiori elements app takes content of its own as a
 custom section - an entry in the manifest and a fragment. There the
-control runs an abap2UI5 app for the object on the page:
+control runs an abap2UI5 app for the object on the page, and the example
+has two of them, one after the other:
 [`fiori-elements/webapp/manifest.json`](https://github.com/abap2UI5/samples-embed-control/blob/standard/fiori-elements/webapp/manifest.json),
 in the object page's settings:
 
@@ -118,6 +119,11 @@ in the object page's settings:
         "template": "demo.fe.ext.Abap2UI5Section",
         "title": "abap2UI5",
         "position": { "placement": "After", "anchor": "General" }
+      },
+      "abap2UI5Second": {
+        "template": "demo.fe.ext.Abap2UI5SecondSection",
+        "title": "abap2UI5 - a second app",
+        "position": { "placement": "After", "anchor": "abap2UI5" }
       }
     }
   }
@@ -142,7 +148,11 @@ The ABAP class reads the key with
 there, are in
 [`fiori-elements/README.md`](https://github.com/abap2UI5/samples-embed-control/blob/standard/fiori-elements/README.md).
 Another customer ends the running abap2UI5 session and starts a new one
-with its key.
+with its key. The second section is the same fragment with another
+formatter for `app`: every control is an abap2UI5 session of its own, so two
+sections are two apps that know nothing of each other - here both run the
+hello world app, which every abap2UI5 installation has; an app of your own
+names two classes of its own.
 
 A Fiori elements app routes by the URL hash, so the abap2UI5 behind it has
 to leave the hash to the page it is embedded in: **abap2UI5 1.146.0 or
@@ -152,8 +162,8 @@ roundtrip, and the object page goes back to the list.
 ## In a Fiori elements app for OData V2: an object page extension
 
 The templates for OData V2 take content of their own as a view extension of
-the object page - again an entry in the manifest and a fragment, here a
-section after the facet `General`:
+the object page - again an entry in the manifest and a fragment, here two:
+a section after the facet `General`, and one after the facet `Language`:
 [`fiori-elements-v2/webapp/manifest.json`](https://github.com/abap2UI5/samples-embed-control/blob/standard/fiori-elements-v2/webapp/manifest.json):
 
 ```json
@@ -164,13 +174,21 @@ section after the facet `General`:
       "className": "sap.ui.core.Fragment",
       "fragmentName": "demo.fev2.ext.Abap2UI5Section",
       "sap.ui.generic.app": { "title": "abap2UI5" }
+    },
+    "AfterFacet|Countries|Language": {
+      "type": "XML",
+      "className": "sap.ui.core.Fragment",
+      "fragmentName": "demo.fev2.ext.Abap2UI5Languages",
+      "sap.ui.generic.app": { "title": "abap2UI5 - every language" }
     }
   }
 }
 ```
 
 [`fiori-elements-v2/webapp/ext/Abap2UI5Section.fragment.xml`](https://github.com/abap2UI5/samples-embed-control/blob/standard/fiori-elements-v2/webapp/ext/Abap2UI5Section.fragment.xml)
-hands three fields of the country on the page to the app:
+hands three fields of the country on the page to the first app,
+[`Abap2UI5Languages.fragment.xml`](https://github.com/abap2UI5/samples-embed-control/blob/standard/fiori-elements-v2/webapp/ext/Abap2UI5Languages.fragment.xml)
+the country alone to the second:
 
 ```xml
 <z2ui5:Container
@@ -182,10 +200,12 @@ hands three fields of the country on the page to the app:
 
 The service is a RAP service, and it is part of the example:
 [`fiori-elements-v2/abap/`](https://github.com/abap2UI5/samples-embed-control/tree/standard/fiori-elements-v2/abap)
-has the CDS view, its metadata extension with the facet, the service
-definition, the OData V2 binding and the abap2UI5 app
+has the CDS view, its metadata extension with the two facets, the service
+definition, the OData V2 binding and the two abap2UI5 apps:
 `Z2UI5_CL_EMBED_COUNTRY`, which reads the fields by name and the country
-again from the view. The dev server answers the service from a mock under
+again from the view, and `Z2UI5_CL_EMBED_LANGUAGES`, which lists the
+country's name in every language of the system. Locally both sections run
+the hello world app. The dev server answers the service from a mock under
 the binding's own paths; the branch `rap` has it all for a system -
 [below](#install-the-branch-rap). It is the successor of
 `abap2UI5-addons/fiori-elements-integration` (no longer published),
@@ -322,7 +342,8 @@ release).
 1. abap2UI5 **1.146.0 or later**, with its HTTP service `/sap/bc/z2ui5`
    active.
 2. Pull the branch `rap` of this repository with abapGit into a new package.
-   It creates the RAP service and `Z2UI5_CL_EMBED_COUNTRY` (`src/01`) and
+   It creates the RAP service, `Z2UI5_CL_EMBED_COUNTRY` and
+   `Z2UI5_CL_EMBED_LANGUAGES` (`src/01`) and
    the BSP `Z2UI5_HOST_FE` with the ICF nodes
    `/sap/bc/ui5_ui5/sap/z2ui5_host_fe` and `/sap/bc/bsp/sap/z2ui5_host_fe`
    (`src/02`) - nothing shared with the branch `standard`, which installs
@@ -335,15 +356,19 @@ release).
 What to look for: the countries of the system in the list report; on the
 object page a section `abap2UI5` after `General Information`, in it the
 startup parameters as the page sent them and the country as the app read it
-from `Z2UI5_C_EMBED_COUNTRY`. Another country starts the app anew, and the
+from `Z2UI5_C_EMBED_COUNTRY`, and a section `abap2UI5 - every language`
+after `Language`, in it the country's name in every language of the system -
+two apps, each in its own session. Another country starts both anew, and the
 URL stays on the object page.
 
 ```
 BSP Z2UI5_HOST_FE                                  the Fiori elements app
   ├─ GET  /sap/opu/odata/sap/Z2UI5_UI_EMBED_COUNTRY_O2/   the RAP service
-  └─ z2ui5.embed.Container                         in the object page
-       ├─ GET  /sap/bc/z2ui5?z2ui5-bundle           the frontend, once
-       └─ POST /sap/bc/z2ui5                        Z2UI5_CL_EMBED_COUNTRY
+  ├─ z2ui5.embed.Container                         after "General Information"
+  │    ├─ GET  /sap/bc/z2ui5?z2ui5-bundle           the frontend, once per page
+  │    └─ POST /sap/bc/z2ui5                        Z2UI5_CL_EMBED_COUNTRY
+  └─ z2ui5.embed.Container                         after "Language"
+       └─ POST /sap/bc/z2ui5                        Z2UI5_CL_EMBED_LANGUAGES
 ```
 
 ## Known limitations

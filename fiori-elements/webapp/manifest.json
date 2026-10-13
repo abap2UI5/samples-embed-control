@@ -104,6 +104,14 @@
                         "placement": "After",
                         "anchor": "General"
                       }
+                    },
+                    "abap2UI5Second": {
+                      "template": "demo.fe.ext.Abap2UI5SecondSection",
+                      "title": "abap2UI5 - a second app",
+                      "position": {
+                        "placement": "After",
+                        "anchor": "abap2UI5"
+                      }
                     }
                   }
                 }
