@@ -399,8 +399,26 @@ installs the control from npm once, for all of them, in the version
 
 ```bash
 npm ci
-npm run start-local              # the freestyle example - start, start:fe, start:fe-v2, start:card for the others
+npm run start-local              # the freestyle example, against abap2UI5 in Node - nothing else to install
+npm run start-local:fe           # the same for start-local:fe-v2 and start-local:card
 ```
+
+`npm run start-local` at the root is the whole local setup in one command:
+it starts abap2UI5 transpiled to JavaScript on `http://localhost:3000`
+([`@abap2ui5/node-runtime`](https://www.npmjs.com/package/@abap2ui5/node-runtime),
+a devDependency of the workspace; `scripts/backend.mjs`) and then the
+example's dev server with `ui5-local.yaml`. A backend already answering on
+port 3000 - `npm run backend` in a terminal of its own, or `npm run express`
+in an abap2UI5 checkout - is used instead. `npm start`, `start:fe`,
+`start:fe-v2` and `start:card` go to the SAP system in the example's
+`ui5.yaml`.
+
+It runs in a GitHub Codespace as well: open the forwarded port 8080. The
+port forwarding of a codespace rewrites `Origin` and `X-Forwarded-Host`, and
+abap2UI5's CSRF check would reject every roundtrip ("CSRF validation
+failed - cross-origin request rejected"); in a codespace (`CODESPACES=true`)
+the local backend drops those headers before abap2UI5 reads them. Keep the
+codespace's ports private.
 
 | Command | |
 |---|---|
@@ -408,6 +426,7 @@ npm run start-local              # the freestyle example - start, start:fe, star
 | `npm run abaplint` | the ABAP of `fiori-elements-v2/abap` against abap2UI5's main (`abaplint.jsonc`) |
 | `npm run build` | `ui5 build` of the examples - the control lands in `dist/thirdparty/z2ui5/embed/` |
 | `ABAP2UI5_DIR=../abap2UI5 npm run bsp` | the branches in `out/standard/` and `out/rap/` (`scripts/build-bsp.mjs`), built with abap2UI5's BSP tools and checked with its page invariants |
+| `npm run backend` | abap2UI5 in Node on port 3000 (`scripts/backend.mjs`), for the e2e tests or an example started with its own `npm run start-local` |
 | `npx playwright test` | the examples in a browser against the backend on port 3000 - the freestyle one on UI5 1.136 and 1.71, the Fiori elements ones on SAPUI5 1.136, the card on OpenUI5 1.136 (`PW_CHROMIUM_PATH` for an installed Chromium) |
 
 CI (`ci.yaml`) runs all of them on every pull request and every night, the

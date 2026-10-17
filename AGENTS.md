@@ -36,6 +36,7 @@ backend (`test/e2e/`), and the build of the branches `standard` and `rap`
 | `card/` | The card example: a UI Integration Card of type `Component`, generic - the class it runs is a card parameter, the backend a card destination the host resolves (`webapp/Component.js`, `onCardReady`) - with `webapp/dt/Configuration.js` for the host's configuration editor and a preview page in `webapp/test/` that `ui5 build` leaves out |
 | `test/e2e/` | Playwright tests of the examples, one spec file each (`playwright.config.mjs`) |
 | `scripts/build-bsp.mjs` | The branches, built with abap2UI5's tools into `out/standard/` and `out/rap/` |
+| `scripts/backend.mjs`, `scripts/start-local.mjs` | The local setup of `main`: `npm run backend` serves abap2UI5 from `@abap2ui5/node-runtime` (a root devDependency) on `localhost:3000`; `npm run start-local[:fe\|:fe-v2\|:card]` at the root starts it - unless port 3000 answers already - and then the example's own `start-local`. Not delivered: an example's README runs the backend as its own folder |
 | `README.md` | The README of `main` and, with a first line of its own, of both branches |
 | `abaplint.jsonc` | abaplint over the examples' ABAP, against abap2UI5's main (`npm run abaplint`) |
 | `.github/workflows/` | `ci.yaml` (checks, the branch build, e2e against abap2UI5 main and the 1.145.0 floor - on every pull request and every night), `deliver.yaml` (on every push to `main`: the same CI, then the branches) |
@@ -111,6 +112,14 @@ examples before it is published. Keep that interface stable:
   in every release the control supports). Do not bring back a middleware
   that drops `Origin`; a proxy that does not send the header is the thing to
   fix.
+- **The one exception is a GitHub Codespace, in `scripts/backend.mjs`.**
+  The port forwarding of a codespace rewrites `Origin` and
+  `X-Forwarded-Host` before the request reaches any of our code, so no
+  proxy setting can make them match. With `CODESPACES=true` - and only
+  then - the local backend drops `Origin`, `Referer` and
+  `X-Forwarded-Host`, and abap2UI5's lenient check lets the request
+  through. Outside a codespace the backend is `serve()` as it ships; never
+  widen the exception, and never move it into a UI5 middleware.
 
 ## The branches
 
