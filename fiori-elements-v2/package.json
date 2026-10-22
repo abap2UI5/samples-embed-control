@@ -11,7 +11,7 @@
     "build": "ui5 build --clean-dest"
   },
   "dependencies": {
-    "@abap2ui5/embed-control": "^0.1.1"
+    "@abap2ui5/embed-control": "^0.3.0"
   },
   "devDependencies": {
     "@sap-ux/ui5-middleware-fe-mockserver": "^2.4.18",
