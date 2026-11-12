@@ -14,8 +14,8 @@
     "@abap2ui5/embed-control": "^0.3.0"
   },
   "devDependencies": {
-    "@sap-ux/ui5-middleware-fe-mockserver": "^2.4.18",
-    "@ui5/cli": "^4.0.71",
+    "@sap-ux/ui5-middleware-fe-mockserver": "^2.4.19",
+    "@ui5/cli": "^4.0.73",
     "ui5-middleware-simpleproxy": "^3.9.0"
   }
 }
