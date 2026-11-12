@@ -48,7 +48,9 @@ backend (`test/e2e/`), and the build of the branches `standard` and `rap`
   `@abap2ui5/embed-control` by version range, the workspace installs one copy
   at its root from the registry, in the version `package-lock.json` names,
   and the branches carry that copy. A new version arrives as a bump of the
-  lockfile (dependabot's `embed-control` group, or by hand after a release).
+  range in every example's `package.json` and of the lockfile (dependabot's
+  `embed-control` group, or by hand after a release) - a new 0.x minor is
+  outside a `^0.y.z` range, so a lockfile bump alone cannot reach it.
 - **One copy, at the root.** Keep the ranges of all examples the same: an
   example with a copy of its own in its `node_modules` would keep that copy
   when embed-control's CI puts the control of its commit at the root. `ci.yaml`
