@@ -375,9 +375,9 @@ BSP Z2UI5_HOST_FE                                  the Fiori elements app
 
 - One frontend per page: the first control that starts decides where it
   comes from; every control still sends its roundtrips to its own endpoint.
-- Embedding is still page-wide in places up to abap2UI5 1.147.0 - busy
-  indicator, title, the full-screen `sap.m.App` root; the release after
-  1.147.0 leaves them to the host, with a `sap.m.NavContainer` as the root
+- Embedding is still page-wide in places up to abap2UI5 1.146.0 - busy
+  indicator, title, the full-screen `sap.m.App` root; 1.147.0 leaves them
+  to the host, with a `sap.m.NavContainer` as the root
   ([backlog item](https://github.com/abap2UI5/abap2UI5/blob/main/backlog/items/embed-as-reuse-component.md));
   the URL hash is the host's from abap2UI5 1.146.0 on.
 - Custom controls from `Z2UI5_CCI`/`Z2UI5_CCC`: the bundle hands over their
@@ -434,8 +434,10 @@ e2e tests against abap2UI5 main and against 1.145.0, the backend floor of
 the control. On every push to `main`, `deliver.yaml` runs the same CI,
 builds the branches and writes each as one commit on top of `main` - never
 change a branch by hand. A new version of the control arrives as a pull
-request that bumps it in `package-lock.json` (dependabot, weekly, or by
-hand after a release).
+request that bumps the range in every example's `package.json` and the
+version in `package-lock.json` (dependabot, weekly, or by hand after a
+release) - a new 0.x minor is outside a `^0.y.z` range, so the range has to
+move along with the lockfile.
 
 [abap2UI5/embed-control](https://github.com/abap2UI5/embed-control) runs
 the branch build and the e2e tests of `main` in its own CI, with the control
